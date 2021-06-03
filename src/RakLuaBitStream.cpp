@@ -211,10 +211,9 @@ void RakLuaBitStream::writeString(std::string_view value)
 
 void RakLuaBitStream::writeEncoded(std::string_view value)
 {
-	bs->AddBitsAndReallocate(value.size() * 16 + 16); // text size + 18 uint16_t textlen
-	std::cout << value.size() << std::endl;
+	bs->AddBitsAndReallocate(value.size() * 16 + 16); // text size + 16 uint16_t textlen
 	reinterpret_cast<void(__thiscall*)(uintptr_t, const char*, int, BitStream*, int)>
-		(sampGetEncodedWriterPtr())(sampGetEncodeDecodeBasePtr(), value.data(), value.size() + 2, bs, 0); // 0x53b90 r3 0x507E0 r1; 0x53a60 r3 0x506B0 r1
+		(sampGetEncodedWriterPtr())(sampGetEncodeDecodeBasePtr(), value.data(), value.size() + 1, bs, 0);
 }
 
 void RakLuaBitStream::writeBuffer(uintptr_t destinationFrom, int size)
