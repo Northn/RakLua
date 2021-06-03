@@ -75,45 +75,41 @@ void RakLua::destroyHandlers(sol::this_state& ts)
 	sol::state_view lua{ ts };
 	int id = lua["script"]["this"]["id"];
 
-	size_t i = 0;
-	for (auto& handler : mHandlers.incomingRpc)
+	for (auto ptr = mHandlers.incomingRpc.begin(); ptr < mHandlers.incomingRpc.end();)
 	{
-		if (id == handler.id)
+		if (id == ptr->id)
 		{
-			mHandlers.incomingRpc.erase(mHandlers.incomingRpc.begin() + i);
+			ptr = mHandlers.incomingRpc.erase(ptr);
 			//break; maybe several hooks?
 		}
-		i++;
+		else ptr++;
 	}
-	i = 0;
-	for (auto& handler : mHandlers.incomingPacket)
+	for (auto ptr = mHandlers.incomingPacket.begin(); ptr < mHandlers.incomingPacket.end();)
 	{
-		if (id == handler.id)
+		if (id == ptr->id)
 		{
-			mHandlers.incomingPacket.erase(mHandlers.incomingPacket.begin() + i);
+			ptr = mHandlers.incomingPacket.erase(ptr);
 			//break; maybe several hooks?
 		}
-		i++;
+		else ptr++;
 	}
-	i = 0;
-	for (auto& handler : mHandlers.outgoingRpc)
+	for (auto ptr = mHandlers.outgoingRpc.begin(); ptr < mHandlers.outgoingRpc.end();)
 	{
-		if (id == handler.id)
+		if (id == ptr->id)
 		{
-			mHandlers.outgoingRpc.erase(mHandlers.outgoingRpc.begin() + i);
+			ptr = mHandlers.outgoingRpc.erase(ptr);
 			//break; maybe several hooks?
 		}
-		i++;
+		else ptr++;
 	}
-	i = 0;
-	for (auto& handler : mHandlers.outgoingPacket)
+	for (auto ptr = mHandlers.outgoingPacket.begin(); ptr < mHandlers.outgoingPacket.end();)
 	{
-		if (id == handler.id)
+		if (id == ptr->id)
 		{
-			mHandlers.outgoingPacket.erase(mHandlers.outgoingPacket.begin() + i);
+			ptr = mHandlers.outgoingPacket.erase(ptr);
 			//break; maybe several hooks?
 		}
-		i++;
+		else ptr++;
 	}
 }
 
