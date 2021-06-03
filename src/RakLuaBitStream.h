@@ -42,6 +42,7 @@ public:
 	float		readFloat();
 	std::string	readString(int32_t len);
 	std::string	readEncoded(int len);
+	bool		readBuffer(uintptr_t destination, int size);
 
 	void		writeBool(bool value);
 	void		writeInt8(int8_t value);
@@ -53,6 +54,8 @@ public:
 	void		writeFloat(float value);
 	void		writeString(std::string_view value);
 	void		writeEncoded(std::string_view value);
+	void		writeBuffer(uintptr_t destinationFrom, int size);
+	void		writeBitStream(RakLuaBitStream* writeBs);
 
 	bool		emulIncomingRPC(uint8_t rpcId);
 	bool		emulIncomingPacket();
@@ -64,6 +67,7 @@ public:
 	bool		sendPacketEx(PacketPriority priority, PacketReliability reliability, uint8_t channel);
 
 	BitStream*	getBitStream();
+	uintptr_t	getDataPtr();
 	
 	void		deleteBs(); // for Lua-deletion
 };

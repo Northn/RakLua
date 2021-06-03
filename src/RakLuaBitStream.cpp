@@ -159,6 +159,11 @@ std::string RakLuaBitStream::readEncoded(int len)
 	return str;
 }
 
+bool RakLuaBitStream::readBuffer(uintptr_t destination, int size)
+{
+	return bs->ReadBits(reinterpret_cast<unsigned char*>(destination), BYTES_TO_BITS(size), false);
+}
+
 void RakLuaBitStream::writeBool(bool value)
 {
 	bs->Write(value);
@@ -210,6 +215,16 @@ void RakLuaBitStream::writeEncoded(std::string_view value)
 	std::cout << value.size() << std::endl;
 	reinterpret_cast<void(__thiscall*)(uintptr_t, const char*, int, BitStream*, int)>
 		(sampGetEncodedWriterPtr())(sampGetEncodeDecodeBasePtr(), value.data(), value.size() + 2, bs, 0); // 0x53b90 r3 0x507E0 r1; 0x53a60 r3 0x506B0 r1
+}
+
+void RakLuaBitStream::writeBuffer(uintptr_t destinationFrom, int size)
+{
+	bs->WriteBits(reinterpret_cast<unsigned char*>(destinationFrom), BYTES_TO_BITS(size), false);
+}
+
+void RakLuaBitStream::writeBitStream(RakLuaBitStream* writeBs)
+{
+	bs->Write(writeBs->getBitStream());
 }
 
 bool RakLuaBitStream::emulIncomingRPC(uint8_t rpcId)
@@ -276,6 +291,11 @@ bool RakLuaBitStream::sendPacket()
 BitStream* RakLuaBitStream::getBitStream()
 {
 	return bs;
+}
+
+uintptr_t RakLuaBitStream::getDataPtr()
+{
+	return reinterpret_cast<uintptr_t>(bs->GetData());
 }
 
 void RakLuaBitStream::deleteBs()

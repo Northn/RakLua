@@ -153,6 +153,7 @@ bool __fastcall handleOutgoingPacket(void* ptr, void*, BitStream* bitStream, Pac
 		if (!RakLua::safeCall(handler.handler, eventId, &luaBs))
 			return false;
 	}
+	luaBs.resetReadPointer();
 	return reinterpret_cast<bool(__thiscall*)(void*, BitStream*, PacketPriority, PacketReliability, char)>
 		(gRakLua.getVmtHook()->getOriginalMethod(6))(ptr, bitStream, priority, reliability, orderingChannel);
 }
@@ -205,6 +206,7 @@ bool __fastcall handleOutgoingRpc(void* ptr, void*, int* id, BitStream* bitStrea
 		if (!RakLua::safeCall(handler.handler, *id, &luaBs))
 			return false;
 	}
+	luaBs.resetReadPointer();
 	return reinterpret_cast<bool(__thiscall*)(void*, int*, BitStream*, PacketPriority, PacketReliability, char, bool)>
 		(gRakLua.getVmtHook()->getOriginalMethod(25))(ptr, id, bitStream, priority, reliability, orderingChannel, shiftTimestamp);
 }

@@ -68,6 +68,7 @@ void initBitStream(sol::state_view& lua)
 	INIT_METHOD(readFloat);
 	INIT_METHOD(readString);
 	INIT_METHOD(readEncoded);
+	INIT_METHOD(readBuffer);
 
 	INIT_METHOD(writeBool);
 	INIT_METHOD(writeInt8);
@@ -79,6 +80,7 @@ void initBitStream(sol::state_view& lua)
 	INIT_METHOD(writeFloat);
 	INIT_METHOD(writeString);
 	INIT_METHOD(writeEncoded);
+	INIT_METHOD(writeBuffer);
 
 	INIT_METHOD(emulIncomingRPC);
 	INIT_METHOD(emulIncomingPacket);
@@ -89,6 +91,7 @@ void initBitStream(sol::state_view& lua)
 	INIT_METHOD(sendPacketEx);
 
 	INIT_METHOD(getBitStream);
+	INIT_METHOD(getDataPtr);
 
 	// Pseudonimes
 	bs_type["skipBits"] = &RakLuaBitStream::ignoreBits;
@@ -133,6 +136,7 @@ void defineGlobals(sol::this_state ts)
 	INIT_FUNCTION(raknetBitStreamReadFloat);
 	INIT_FUNCTION(raknetBitStreamReadString);
 	INIT_FUNCTION(raknetBitStreamDecodeString);
+	INIT_FUNCTION(raknetBitStreamReadBuffer);
 
 	INIT_FUNCTION(raknetBitStreamWriteBool);
 	INIT_FUNCTION(raknetBitStreamWriteInt8);
@@ -141,6 +145,8 @@ void defineGlobals(sol::this_state ts)
 	INIT_FUNCTION(raknetBitStreamWriteFloat);
 	INIT_FUNCTION(raknetBitStreamWriteString);
 	INIT_FUNCTION(raknetBitStreamEncodeString);
+	INIT_FUNCTION(raknetBitStreamWriteBuffer);
+	INIT_FUNCTION(raknetBitStreamWriteBitStream);
 
 	INIT_FUNCTION(raknetSendRpc);
 	INIT_FUNCTION(raknetSendBitStream);
@@ -149,6 +155,8 @@ void defineGlobals(sol::this_state ts)
 
 	INIT_FUNCTION(raknetEmulRpcReceiveBitStream);
 	INIT_FUNCTION(raknetEmulPacketReceiveBitStream);
+
+	INIT_FUNCTION(raknetBitStreamGetDataPtr);
 
 	INIT_FUNCTION(sampSendRconCommand);
 	INIT_FUNCTION(sampSendClickPlayer);

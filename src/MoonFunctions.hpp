@@ -123,6 +123,11 @@ std::string raknetBitStreamDecodeString(RakLuaBitStream* bs, int size)
 	return bs->readEncoded(size);
 }
 
+bool raknetBitStreamReadBuffer(RakLuaBitStream* bs, uintptr_t destination, int size)
+{
+	return bs->readBuffer(destination, size);
+}
+
 void raknetBitStreamWriteBool(RakLuaBitStream* bs, bool value)
 {
 	bs->writeBool(value);
@@ -158,6 +163,16 @@ void raknetBitStreamEncodeString(RakLuaBitStream* bs, std::string_view value)
 	bs->writeEncoded(value);
 }
 
+void raknetBitStreamWriteBuffer(RakLuaBitStream* bs, uintptr_t destinationFrom, int size)
+{
+	bs->writeBuffer(destinationFrom, size);
+}
+
+void raknetBitStreamWriteBitStream(RakLuaBitStream* bs, RakLuaBitStream* writeBs)
+{
+	bs->writeBitStream(writeBs);
+}
+
 bool raknetSendRpc(int rpcId, RakLuaBitStream* bs)
 {
 	return bs->sendRPC(rpcId);
@@ -181,6 +196,11 @@ bool raknetSendBitStreamEx(RakLuaBitStream* bs, PacketPriority priority, PacketR
 bool raknetEmulRpcReceiveBitStream(uint8_t rpcId, RakLuaBitStream* bs)
 {
 	return bs->emulIncomingRPC(rpcId);
+}
+
+uintptr_t raknetBitStreamGetDataPtr(RakLuaBitStream* bs)
+{
+	return bs->getDataPtr();
 }
 
 bool raknetEmulPacketReceiveBitStream(uint8_t packetId /* Why, FYP, why?!*/, RakLuaBitStream* bs)
