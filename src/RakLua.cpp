@@ -249,7 +249,7 @@ bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int len
 			delete[] input;
 	}
 	else
-		return false;
+		callback_bs = new BitStream;
 
 	RakLuaBitStream luaBs(callback_bs);
 	for (auto& handler : gRakLua.getHandlers().incomingRpc)
