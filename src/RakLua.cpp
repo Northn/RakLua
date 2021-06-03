@@ -115,25 +115,22 @@ void RakLua::destroyHandlers(sol::this_state& ts)
 
 template <typename... Args>
 static bool RakLua::safeCall(sol::function handler, Args&&... args)
-{
-	try
+try {
+	sol::protected_function_result result = handler(std::forward<Args>(args)...);
+	if (result.valid())
 	{
-		sol::protected_function_result result = handler(std::forward<Args>(args)...);
-		if (result.valid())
+		int count = result.return_count();
+		if (count == 1 && result.get_type() == sol::type::boolean)
 		{
-			int count = result.return_count();
-			if (count == 1 && result.get_type() == sol::type::boolean)
-			{
-				bool ret = result;
-				if (!ret)
-					return false;
-			}
+			bool ret = result;
+			if (!ret)
+				return false;
 		}
 	}
-	catch (...)
-	{
-		return true;
-	}
+	return true;
+}
+catch (...)
+{
 	return true;
 }
 
