@@ -52,6 +52,9 @@ void initBitStream(sol::state_view& lua)
 	INIT_METHOD(setReadOffset);
 	INIT_METHOD(setWriteOffset);
 
+	INIT_METHOD(getReadOffset);
+	INIT_METHOD(getWriteOffset);
+
 	INIT_METHOD(ignoreBits);
 	INIT_METHOD(ignoreBytes);
 
@@ -119,6 +122,9 @@ void defineGlobals(sol::this_state ts)
 
 	INIT_FUNCTION(raknetBitStreamGetNumberOfUnreadBits);
 	INIT_FUNCTION(raknetBitStreamGetNumberOfUnreadBytes);
+
+	INIT_FUNCTION(raknetBitStreamGetWriteOffset);
+	INIT_FUNCTION(raknetBitStreamGetReadOffset);
 
 	INIT_FUNCTION(raknetBitStreamReadBool);
 	INIT_FUNCTION(raknetBitStreamReadInt8);

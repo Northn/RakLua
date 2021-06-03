@@ -78,6 +78,16 @@ int raknetBitStreamGetNumberOfUnreadBytes(RakLuaBitStream* bs)
 	return bs->getNumberOfUnreadBytes();
 }
 
+int raknetBitStreamGetWriteOffset(RakLuaBitStream* bs)
+{
+	return bs->getWriteOffset();
+}
+
+int raknetBitStreamGetReadOffset(RakLuaBitStream* bs)
+{
+	return bs->getReadOffset();
+}
+
 bool raknetBitStreamReadBool(RakLuaBitStream* bs)
 {
 	return bs->readBool();
