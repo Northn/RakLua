@@ -13,15 +13,13 @@ bool isSampAvailable()
 	return isSampLoaded() && sampGetSampInfoPtr() != NULL;
 }
 
-RakLuaBitStream* raknetNewBitStream()
+std::unique_ptr<RakLuaBitStream> raknetNewBitStream()
 {
-	return new RakLuaBitStream;
+	return std::make_unique<RakLuaBitStream>();
 }
 
 void raknetDeleteBitStream(RakLuaBitStream* bs)
-{
-	delete bs;
-}
+{ /* Empty realisation */ }
 
 void raknetResetBitStream(RakLuaBitStream* bs)
 {
