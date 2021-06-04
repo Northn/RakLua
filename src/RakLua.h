@@ -58,6 +58,7 @@ inline PlayerID gPlayerId;
 		}																				\
 		else ptr++;																		\
 	}
+#define ADD_EVENT_HANDLER(handlerList) mHandlers.handlerList.push_back({ id, detour }); break
 
 bool __fastcall handleOutgoingPacket(void* ptr, void*, BitStream* bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel);
 Packet* __fastcall handleIncomingPacket(void* ptr, void*);

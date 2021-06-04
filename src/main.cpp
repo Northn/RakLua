@@ -183,9 +183,9 @@ void defineGlobals(sol::this_state ts)
 
 #undef INIT_FUNCTION
 
-void registerHandler(sol::this_state ts, RakLua::eEventType type, sol::function fs)
+bool registerHandler(sol::this_state ts, RakLua::eEventType type, sol::function fs)
 {
-	gRakLua.addEventHandler(ts, type, fs);
+	return gRakLua.addEventHandler(ts, type, fs);
 }
 
 void destroyHandlers(sol::this_state ts)

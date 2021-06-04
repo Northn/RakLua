@@ -53,17 +53,13 @@ bool RakLua::addEventHandler(sol::this_state& ts, eEventType type, sol::function
 	switch (type)
 	{
 	case INCOMING_RPC:
-		mHandlers.incomingRpc.push_back({ id, detour });
-		break;
+		ADD_EVENT_HANDLER(incomingRpc);
 	case OUTGOING_RPC:
-		mHandlers.outgoingRpc.push_back({ id, detour });
-		break;
+		ADD_EVENT_HANDLER(outgoingRpc);
 	case INCOMING_PACKET:
-		mHandlers.incomingPacket.push_back({ id, detour });
-		break;
+		ADD_EVENT_HANDLER(incomingPacket);
 	case OUTGOING_PACKET:
-		mHandlers.outgoingPacket.push_back({ id, detour });
-		break;
+		ADD_EVENT_HANDLER(outgoingPacket);
 	default:
 		return false;
 	}
