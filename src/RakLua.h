@@ -49,6 +49,15 @@ inline PlayerID gPlayerId;
 #define MAX_ALLOCA_STACK_ALLOCATION 1048576
 #define ID_RPC 20
 #define RECEIVE_PACKET(ptr) reinterpret_cast<Packet*(__thiscall*)(void*)>(gRakLua.getVmtHook()->getOriginalMethod(8))(ptr)
+#define DESTROY_HANDLERS(handlerList) \
+	for (auto ptr = mHandlers.handlerList.begin(); ptr < mHandlers.handlerList.end();)	\
+	{																					\
+		if (id == ptr->id)																\
+		{																				\
+			ptr = mHandlers.handlerList.erase(ptr);										\
+		}																				\
+		else ptr++;																		\
+	}
 
 bool __fastcall handleOutgoingPacket(void* ptr, void*, BitStream* bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel);
 Packet* __fastcall handleIncomingPacket(void* ptr, void*);

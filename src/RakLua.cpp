@@ -75,42 +75,10 @@ void RakLua::destroyHandlers(sol::this_state& ts)
 	sol::state_view lua{ ts };
 	int id = lua["script"]["this"]["id"];
 
-	for (auto ptr = mHandlers.incomingRpc.begin(); ptr < mHandlers.incomingRpc.end();)
-	{
-		if (id == ptr->id)
-		{
-			ptr = mHandlers.incomingRpc.erase(ptr);
-			//break; maybe several hooks?
-		}
-		else ptr++;
-	}
-	for (auto ptr = mHandlers.incomingPacket.begin(); ptr < mHandlers.incomingPacket.end();)
-	{
-		if (id == ptr->id)
-		{
-			ptr = mHandlers.incomingPacket.erase(ptr);
-			//break; maybe several hooks?
-		}
-		else ptr++;
-	}
-	for (auto ptr = mHandlers.outgoingRpc.begin(); ptr < mHandlers.outgoingRpc.end();)
-	{
-		if (id == ptr->id)
-		{
-			ptr = mHandlers.outgoingRpc.erase(ptr);
-			//break; maybe several hooks?
-		}
-		else ptr++;
-	}
-	for (auto ptr = mHandlers.outgoingPacket.begin(); ptr < mHandlers.outgoingPacket.end();)
-	{
-		if (id == ptr->id)
-		{
-			ptr = mHandlers.outgoingPacket.erase(ptr);
-			//break; maybe several hooks?
-		}
-		else ptr++;
-	}
+	DESTROY_HANDLERS(incomingRpc);
+	DESTROY_HANDLERS(incomingPacket);
+	DESTROY_HANDLERS(outgoingRpc);
+	DESTROY_HANDLERS(outgoingPacket);
 }
 
 template <typename... Args>
