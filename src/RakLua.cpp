@@ -180,7 +180,7 @@ bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int len
 	uint8_t id = 0;
 	uint32_t bits_data = 0;
 	unsigned char* input = nullptr;
-	BitStream* callback_bs;
+	std::unique_ptr<BitStream> callback_bs = std::make_unique<BitStream>();
 
 	BitStream bs(data, length, true);
 	bs.IgnoreBits(8);
@@ -211,21 +211,18 @@ bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int len
 			return false; // Not enough data to read
 		}
 
-		callback_bs = new BitStream(input, BITS_TO_BYTES(bits_data), true);
+		callback_bs = std::make_unique<BitStream>(input, BITS_TO_BYTES(bits_data), true);
 
 		if (!used_alloca)
 			delete[] input;
 	}
-	else
-		callback_bs = new BitStream;
 
-	RakLuaBitStream luaBs(callback_bs);
+	RakLuaBitStream luaBs(callback_bs.get());
 	for (auto& handler : gRakLua.getHandlers().incomingRpc)
 	{
 		luaBs.resetReadPointer();
 		if (!RakLua::safeCall(handler.handler, id, &luaBs))
 		{
-			delete callback_bs;
 			return false;
 		}
 	}
@@ -236,8 +233,6 @@ bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int len
 	bs.WriteCompressed(bits_data);
 	if (bits_data)
 		bs.WriteBits(callback_bs->GetData(), bits_data, false);
-
-	delete callback_bs;
 
 	return reinterpret_cast<bool(__thiscall*)(void*, unsigned char*, int, PlayerID)>
 		(gRakLua.getRpcHook()->getTrampoline())(ptr, bs.GetData(), bs.GetNumberOfBytesUsed(), playerId);
