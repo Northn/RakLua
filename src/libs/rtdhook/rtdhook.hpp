@@ -134,9 +134,10 @@ public:
 	 */
 	~rtdhook_vmt()
 	{
-		for (auto& method : mHookedList)
+		for (auto ptr = mHookedList.begin(); ptr < mHookedList.end();)
 		{
-			uninstall(method.id);
+			rewrite_pointer(ptr->id, ptr->original);
+			ptr = mHookedList.erase(ptr);
 		}
 	}
 
