@@ -81,6 +81,7 @@ void initBitStream(sol::state_view& lua)
 	INIT_METHOD(writeString);
 	INIT_METHOD(writeEncoded);
 	INIT_METHOD(writeBuffer);
+	INIT_METHOD(writeBitStream);
 
 	INIT_METHOD(emulIncomingRPC);
 	INIT_METHOD(emulIncomingPacket);
