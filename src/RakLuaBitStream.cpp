@@ -261,6 +261,7 @@ bool RakLuaBitStream::emulIncomingPacket()
 
 bool RakLuaBitStream::sendRPC(int rpcId)
 {
+	if (!gRakLua.isInitialized()) return false;
 	return reinterpret_cast<bool(__thiscall*)(uintptr_t, int*, BitStream*, PacketPriority, PacketReliability, char, bool)>
 		(gRakLua.getVmtHook()->getOriginalMethod(25))
 		(RAKCLIENT_INTF, &rpcId, bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, false);
@@ -268,6 +269,7 @@ bool RakLuaBitStream::sendRPC(int rpcId)
 
 bool RakLuaBitStream::sendRPCEx(int rpcId, PacketPriority priority, PacketReliability reliability, uint8_t channel, bool timestamp)
 {
+	if (!gRakLua.isInitialized()) return false;
 	return reinterpret_cast<bool(__thiscall*)(uintptr_t, int*, BitStream*, PacketPriority, PacketReliability, char, bool)>
 		(gRakLua.getVmtHook()->getOriginalMethod(25))
 		(RAKCLIENT_INTF, &rpcId, bs, priority, reliability, channel, timestamp);
@@ -275,12 +277,14 @@ bool RakLuaBitStream::sendRPCEx(int rpcId, PacketPriority priority, PacketReliab
 
 bool RakLuaBitStream::sendPacketEx(PacketPriority priority, PacketReliability reliability, uint8_t channel)
 {
+	if (!gRakLua.isInitialized()) return false;
 	return reinterpret_cast<bool(__thiscall*)(uintptr_t, BitStream*, PacketPriority, PacketReliability, char)>
 		(gRakLua.getVmtHook()->getOriginalMethod(6))(RAKCLIENT_INTF, bs, priority, reliability, channel);
 }
 
 bool RakLuaBitStream::sendPacket()
 {
+	if (!gRakLua.isInitialized()) return false;
 	return reinterpret_cast<bool(__thiscall*)(uintptr_t, BitStream*, PacketPriority, PacketReliability, char)>
 		(gRakLua.getVmtHook()->getOriginalMethod(6))(RAKCLIENT_INTF, bs, HIGH_PRIORITY, UNRELIABLE_SEQUENCED, 0);
 }

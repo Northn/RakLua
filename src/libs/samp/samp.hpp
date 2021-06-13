@@ -19,8 +19,8 @@ const uintptr_t samp_addressess[][10]
 
 inline uintptr_t sampGetBase()
 {
-    static uintptr_t sampBase = SAMP_NOT_LOADED;
-    if (sampBase == SAMP_NOT_LOADED)
+    static uintptr_t sampBase = SAMPVER::SAMP_NOT_LOADED;
+    if (sampBase == SAMPVER::SAMP_NOT_LOADED)
         sampBase = reinterpret_cast<uintptr_t>(GetModuleHandleA("samp.dll"));
     return sampBase;
 }
@@ -29,11 +29,11 @@ inline uintptr_t sampGetBase()
 
 inline SAMPVER sampGetVersion()
 {
-    static SAMPVER sampVersion = SAMP_NOT_LOADED;
-    if (sampVersion <= SAMP_UNKNOWN)
+    static SAMPVER sampVersion = SAMPVER::SAMP_NOT_LOADED;
+    if (sampVersion <= SAMPVER::SAMP_UNKNOWN)
 	{
         uintptr_t base = sampGetBase();
-        if (base == SAMP_NOT_LOADED) return SAMP_NOT_LOADED;
+        if (base == SAMPVER::SAMP_NOT_LOADED) return SAMPVER::SAMP_NOT_LOADED;
 
         IMAGE_NT_HEADERS* ntHeader = reinterpret_cast<IMAGE_NT_HEADERS*>(base + reinterpret_cast<IMAGE_DOS_HEADER*>(base)->e_lfanew);
 
@@ -41,13 +41,13 @@ inline SAMPVER sampGetVersion()
         switch (ep)
         {
         case 0x31DF13:
-            sampVersion = SAMP_037_R1;
+            sampVersion = SAMPVER::SAMP_037_R1;
             break;
         case 0xCC4D0:
-            sampVersion = SAMP_037_R3_1;
+            sampVersion = SAMPVER::SAMP_037_R3_1;
             break;
         default:
-            sampVersion = SAMP_UNKNOWN;
+            sampVersion = SAMPVER::SAMP_UNKNOWN;
         }
     }
 

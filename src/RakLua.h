@@ -10,11 +10,11 @@ public:
 	enum eInitState { OK, SAMP_NOT_LOADED, SAMP_UNKNOWN, INITIALIZING, NOT_INITIALIZED /* for internal usage */ };
 	struct event_handler_t { int id; sol::function handler; };
 private:
-	eInitState		mState = NOT_INITIALIZED;
+	eInitState		mState = eInitState::NOT_INITIALIZED;
 
-	rtdhook_vmt*	mVmtHook;
-	rtdhook*		mIncomingRpcHandlerHook;
-	rtdhook*		mRakClientIntfConstructor;
+	rtdhook_vmt*	mVmtHook = nullptr;
+	rtdhook*		mIncomingRpcHandlerHook = nullptr;
+	rtdhook*		mRakClientIntfConstructor = nullptr;
 
 	struct handlers {
 		std::vector<event_handler_t> incomingRpc;
@@ -30,7 +30,7 @@ public:
 	bool		addEventHandler(sol::this_state& ts, eEventType type, sol::function detour);
 	void		destroyHandlers(sol::this_state& ts);
 
-	inline bool			isInitialized() { return mState == OK; }
+	inline bool			isInitialized() { return mState == eInitState::OK; }
 	inline eInitState	getState()		{ return mState; }
 	inline rtdhook_vmt* getVmtHook()	{ return mVmtHook; };
 	inline handlers&	getHandlers()	{ return mHandlers; };

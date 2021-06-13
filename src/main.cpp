@@ -231,7 +231,7 @@ sol::table open(sol::this_state ts)
 	sol::state_view lua(ts);
 
 	sol::table module = lua.create_table();
-	module["VERSION"] = 2.0;
+	module["VERSION"] = 2.01;
 	module.set_function("getState", &getState);
 
 	module.set_function("registerHandler", &registerHandler);

@@ -3,24 +3,24 @@
 
 RakLua::eInitState RakLua::initialize()
 {
-	if (mState != NOT_INITIALIZED)
+	if (mState != eInitState::NOT_INITIALIZED)
 		goto returnState;
 
 	uintptr_t samp = sampGetBase();
-	if (samp == SAMP_NOT_LOADED)
+	if (samp == SAMPVER::SAMP_NOT_LOADED)
 	{
-		mState = SAMP_NOT_LOADED;
+		mState = eInitState::SAMP_NOT_LOADED;
 		goto returnState;
 	}
 
 	SAMPVER sampVersion = sampGetVersion();
-	if (sampVersion == SAMP_UNKNOWN)
+	if (sampVersion == SAMPVER::SAMP_UNKNOWN)
 	{
-		mState = SAMP_UNKNOWN;
+		mState = eInitState::SAMP_UNKNOWN;
 		goto returnState;
 	}
 
-	mState = INITIALIZING;
+	mState = eInitState::INITIALIZING;
 
 	std::thread([&]() {
 		uintptr_t sampInfo = sampGetSampInfoPtr();
@@ -32,7 +32,7 @@ RakLua::eInitState RakLua::initialize()
 		mVmtHook->install(8, &handleIncomingPacket);
 		mVmtHook->install(25, &handleOutgoingRpc);
 
-		mState = OK;
+		mState = eInitState::OK;
 	}).detach();
 
 	mIncomingRpcHandlerHook = new rtdhook(sampGetIncomingRpcHandlerPtr(), &handleIncomingRpc);
