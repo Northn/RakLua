@@ -13,7 +13,7 @@ enum SAMPVER {
 const uintptr_t samp_addressess[][10]
 {
     //  CNetGame    RakClientInterface    StringWriteEncoder   StringReadDecoder   CompressorPtr   HandleRpc   RakClientIntfConstr, alloc_packet, write_lock, write_unlock
-    {0x21A0F8,      0x3C9,                0x506B0,             0x507E0,            0x10D894,       0x372f,    0x33DC0, 0x347e0, 0x35b10, 0x35b50},	    // SAMP_037_R1
+    {0x21A0F8,      0x3C9,                0x506B0,             0x507E0,            0x10D894,       0x372f0,    0x33DC0, 0x347e0, 0x35b10, 0x35b50},	    // SAMP_037_R1
     {0x26E8DC,      0x2C,                 0x53A60,             0x53B90,            0x121914,       0x3a6a0,	  0x37170, 0x37b90, 0x38ec0, 0x38f00}      // SAMP_037_R3_1
 };
 
