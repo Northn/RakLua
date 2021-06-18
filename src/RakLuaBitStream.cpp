@@ -232,8 +232,8 @@ bool RakLuaBitStream::emulIncomingRPC(uint8_t rpcId)
 	BitStream sendBs;
 	sendBs.Write<uint8_t>(ID_RPC);
 	sendBs.Write(rpcId);
-	sendBs.WriteCompressed<unsigned int>(BYTES_TO_BITS(bs->GetNumberOfBytesUsed()));
-	sendBs.WriteBits(bs->GetData(), BYTES_TO_BITS(bs->GetNumberOfBytesUsed()), false);
+	sendBs.WriteCompressed<unsigned int>(bs->GetNumberOfBitsUsed());
+	sendBs.WriteBits(bs->GetData(), bs->GetNumberOfBitsUsed(), false);
 	return reinterpret_cast<bool(__thiscall*)(void*, unsigned char*, int, PlayerID)>
 		(gRakLua.getRpcHook()->getTrampoline())(gRakPeer, sendBs.GetData(), sendBs.GetNumberOfBytesUsed(), gPlayerId);
 }
