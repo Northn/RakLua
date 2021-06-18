@@ -234,9 +234,9 @@ bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int len
 		(gRakLua.getRpcHook()->getTrampoline())(ptr, bs.GetData(), bs.GetNumberOfBytesUsed(), playerId);
 }
 
-uintptr_t __stdcall hookRakClientIntfConstructor()
+uintptr_t hookRakClientIntfConstructor()
 {
-	uintptr_t rakClientInterface = reinterpret_cast<uintptr_t(__stdcall*)()>(gRakLua.getIntfConstructorHook()->getTrampoline())();
+	uintptr_t rakClientInterface = reinterpret_cast<uintptr_t(*)()>(gRakLua.getIntfConstructorHook()->getTrampoline())();
 	if (rakClientInterface)
 		gRakPeer = reinterpret_cast<void*>(rakClientInterface - 3550);
 	return rakClientInterface;

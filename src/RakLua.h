@@ -64,4 +64,4 @@ bool __fastcall handleOutgoingPacket(void* ptr, void*, BitStream* bitStream, Pac
 Packet* __fastcall handleIncomingPacket(void* ptr, void*);
 bool __fastcall handleOutgoingRpc(void* ptr, void*, int* id, BitStream* bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, bool shiftTimestamp);
 bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int length, PlayerID playerId);
-uintptr_t __stdcall hookRakClientIntfConstructor();
+uintptr_t hookRakClientIntfConstructor();
