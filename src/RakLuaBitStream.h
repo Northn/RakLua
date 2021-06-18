@@ -58,7 +58,7 @@ public:
 	void		writeBitStream(RakLuaBitStream* writeBs);
 
 	bool		emulIncomingRPC(uint8_t rpcId);
-	bool		emulIncomingPacket();
+	bool		emulIncomingPacket(uint8_t packetId);
 
 	bool		sendRPC(int rpcId);
 	bool		sendPacket();

@@ -203,10 +203,7 @@ uintptr_t raknetBitStreamGetDataPtr(RakLuaBitStream* bs)
 
 bool raknetEmulPacketReceiveBitStream(uint8_t packetId /* Why, FYP, why?!*/, RakLuaBitStream* bs)
 {
-	BitStream send_bs;
-	send_bs.Write(packetId);
-	send_bs.WriteBits(bs->getBitStream()->GetData(), bs->getNumberOfBitsUsed(), false);
-	return RakLuaBitStream(&send_bs).emulIncomingPacket();
+	return bs->emulIncomingPacket(packetId);
 }
 
 // samp*()

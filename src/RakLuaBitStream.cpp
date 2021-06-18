@@ -238,12 +238,17 @@ bool RakLuaBitStream::emulIncomingRPC(uint8_t rpcId)
 		(gRakLua.getRpcHook()->getTrampoline())(gRakPeer, sendBs.GetData(), sendBs.GetNumberOfBytesUsed(), gPlayerId);
 }
 
-bool RakLuaBitStream::emulIncomingPacket()
+bool RakLuaBitStream::emulIncomingPacket(uint8_t packetId)
 {
 	if (!gRakLua.isInitialized() || !gRakPeer) return false;
 
-	Packet* send_packet = reinterpret_cast<Packet*(*)(int)>(sampGetAllocPacketPtr())(bs->GetNumberOfBytesUsed());
-	memcpy(send_packet->data, bs->GetData(), send_packet->length);
+	BitStream send_bs;
+
+	send_bs.Write(packetId);
+	send_bs.WriteBits(bs->GetData(), bs->GetNumberOfBitsUsed(), false);
+	
+	Packet* send_packet = reinterpret_cast<Packet*(*)(int)>(sampGetAllocPacketPtr())(send_bs.GetNumberOfBytesUsed());
+	memcpy(send_packet->data, send_bs.GetData(), send_packet->length);
 
 	// RakPeer::AddPacketToProducer
 	char* packets = static_cast<char*>(gRakPeer) + 0xdb6;
