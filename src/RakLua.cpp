@@ -22,27 +22,24 @@ RakLua::eInitState RakLua::initialize()
 
 	mState = eInitState::INITIALIZING;
 
-	std::thread([&]() {
-		uintptr_t sampInfo = sampGetSampInfoPtr();
-		while (!sampInfo)
-			sampInfo = sampGetSampInfoPtr();
-
-		mVmtHook = new rtdhook_vmt(*reinterpret_cast<uintptr_t*>(sampGetRakClientInterface()));
-		mVmtHook->install(6, &handleOutgoingPacket);
-		mVmtHook->install(8, &handleIncomingPacket);
-		mVmtHook->install(25, &handleOutgoingRpc);
-
-		mState = eInitState::OK;
-	}).detach();
-
-	mIncomingRpcHandlerHook = new rtdhook(sampGetIncomingRpcHandlerPtr(), &handleIncomingRpc);
-	mIncomingRpcHandlerHook->install();
-
 	mRakClientIntfConstructor = new rtdhook(sampGetRakClientIntfConstructorPtr(), &hookRakClientIntfConstructor, 7);
 	mRakClientIntfConstructor->install();
 
 returnState:
 	return mState;
+}
+
+void RakLua::postRakClientInitialization(uintptr_t rakClientIntf)
+{
+	mIncomingRpcHandlerHook = new rtdhook(sampGetIncomingRpcHandlerPtr(), &handleIncomingRpc);
+	mIncomingRpcHandlerHook->install();
+
+	mVmtHook = new rtdhook_vmt(rakClientIntf);
+	mVmtHook->install(6, &handleOutgoingPacket);
+	mVmtHook->install(8, &handleIncomingPacket);
+	mVmtHook->install(25, &handleOutgoingRpc);
+
+	mState = eInitState::OK;
 }
 
 bool RakLua::addEventHandler(sol::this_state& ts, eEventType type, sol::function detour)
@@ -121,9 +118,7 @@ bool inlineIncomingPacketHandler(uint8_t id, RakLuaBitStream& luaBs)
 	{
 		luaBs.resetReadPointer();
 		if (!RakLua::safeCall(handler.handler, id, &luaBs))
-		{
 			return false;
-		}
 	}
 	return true;
 }
@@ -238,6 +233,9 @@ uintptr_t hookRakClientIntfConstructor()
 {
 	uintptr_t rakClientInterface = reinterpret_cast<uintptr_t(*)()>(gRakLua.getIntfConstructorHook()->getTrampoline())();
 	if (rakClientInterface)
-		gRakPeer = reinterpret_cast<void*>(rakClientInterface - 3550);
+	{
+		gRakPeer = reinterpret_cast<void*>(rakClientInterface - 0xDDE);
+		gRakLua.postRakClientInitialization(rakClientInterface);
+	}
 	return rakClientInterface;
 }

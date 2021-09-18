@@ -26,6 +26,8 @@ private:
 public:
 	eInitState	initialize();
 	bool		destroy();
+	
+	void		postRakClientInitialization(uintptr_t rakClientIntf);
 
 	bool		addEventHandler(sol::this_state& ts, eEventType type, sol::function detour);
 	void		destroyHandlers(sol::this_state& ts);

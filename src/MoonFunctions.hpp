@@ -201,7 +201,7 @@ uintptr_t raknetBitStreamGetDataPtr(RakLuaBitStream* bs)
 	return bs->getDataPtr();
 }
 
-bool raknetEmulPacketReceiveBitStream(uint8_t packetId /* Why, FYP, why?!*/, RakLuaBitStream* bs)
+bool raknetEmulPacketReceiveBitStream(uint8_t packetId, RakLuaBitStream* bs)
 {
 	return bs->emulIncomingPacket(packetId);
 }
@@ -225,7 +225,7 @@ void sampSendClickPlayer(uint16_t playerId, uint8_t source)
 	RakLuaBitStream(&bs).sendRPC(23);
 }
 
-void sampSendDialogResponse(uint16_t id, uint8_t button, int16_t listItem, std::string_view string = "")
+void sampSendDialogResponse(uint16_t id, uint8_t button, uint16_t listItem, std::string_view string = "")
 {
 	BitStream bs;
 	bs.Write(id);
@@ -245,7 +245,7 @@ void sampSendClickTextdraw(uint16_t id)
 	RakLuaBitStream(&bs).sendRPC(62);
 }
 
-void sampSendGiveDamage(uint16_t id, float damage, int weapon, int bodyPart)
+void sampSendGiveDamage(uint16_t id, float damage, int32_t weapon, int32_t bodyPart)
 {
 	BitStream bs;
 	bs.Write(false);
@@ -256,7 +256,7 @@ void sampSendGiveDamage(uint16_t id, float damage, int weapon, int bodyPart)
 	RakLuaBitStream(&bs).sendRPC(115);
 }
 
-void sampSendTakeDamage(uint16_t id, float damage, int weapon, int bodyPart)
+void sampSendTakeDamage(uint16_t id, float damage, int32_t weapon, int32_t bodyPart)
 {
 	BitStream bs;
 	bs.Write(true);
@@ -267,7 +267,10 @@ void sampSendTakeDamage(uint16_t id, float damage, int weapon, int bodyPart)
 	RakLuaBitStream(&bs).sendRPC(115);
 }
 
-void sampSendEditObject(bool playerObject, uint16_t objectId, int response, float posX, float posY, float posZ, float rotX, float rotY, float rotZ)
+void sampSendEditObject(bool playerObject, uint16_t objectId, int32_t response,
+	float posX, float posY, float posZ,
+	float rotX, float rotY, float rotZ
+)
 {
 	BitStream bs;
 	bs.Write(playerObject);
@@ -286,7 +289,11 @@ void sampSendEditObject(bool playerObject, uint16_t objectId, int response, floa
 }
 
 // TODO: COLOR?
-void sampSendEditAttachedObject(int response, int index, int model, int bone, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, float scaleX, float scaleY, float scaleZ)
+void sampSendEditAttachedObject(int32_t response, int32_t index, int32_t model, int32_t bone,
+	float posX, float posY, float posZ,
+	float rotX, float rotY, float rotZ,
+	float scaleX, float scaleY, float scaleZ
+)
 {
 	BitStream bs;
 	bs.Write(response);
@@ -306,8 +313,8 @@ void sampSendEditAttachedObject(int response, int index, int model, int bone, fl
 	bs.Write(scaleY);
 	bs.Write(scaleZ);
 
-	bs.Write<int>(0);
-	bs.Write<int>(0);
+	bs.Write<int32_t>(0);
+	bs.Write<int32_t>(0);
 
 	RakLuaBitStream(&bs).sendRPC(116);
 }
@@ -324,7 +331,7 @@ void sampSendRequestSpawn()
 	RakLuaBitStream().sendRPC(129);
 }
 
-void sampSendPickedUpPickup(int id)
+void sampSendPickedUpPickup(int32_t id)
 {
 	BitStream bs;
 	bs.Write(id);
@@ -384,7 +391,7 @@ void sampSendEnterVehicle(uint16_t id, bool passenger)
 {
 	BitStream bs;
 	bs.Write(id);
-	bs.Write(passenger);
+	bs.Write<uint8_t>(passenger);
 	RakLuaBitStream(&bs).sendRPC(26);
 }
 
@@ -400,7 +407,7 @@ void sampSendSpawn()
 	RakLuaBitStream().sendRPC(52);
 }
 
-void sampSendDamageVehicle(uint16_t id, int panel, int doors, uint8_t lights, uint8_t tires)
+void sampSendDamageVehicle(uint16_t id, int32_t panel, int32_t doors, uint8_t lights, uint8_t tires)
 {
 	BitStream bs;
 	bs.Write(id);
@@ -414,8 +421,10 @@ void sampSendDamageVehicle(uint16_t id, int panel, int doors, uint8_t lights, ui
 void sampSendUpdatePlayers()
 {
 	static DWORD dwLastUpdateTick = 0;
+#pragma warning(disable : 28159) // Consider using GetTickCount64 function instead of GetTickCount
 	if ((GetTickCount() - dwLastUpdateTick) > 3000) {
 		dwLastUpdateTick = GetTickCount();
+#pragma warning(default : 28159)
 		RakLuaBitStream().sendRPC(155);
 	}
 }

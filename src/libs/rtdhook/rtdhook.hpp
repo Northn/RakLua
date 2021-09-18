@@ -4,7 +4,9 @@
 #include <windows.h>			// VirtualProtect
 #include <vector>
 
-#pragma warning(disable : 6387) // warning C6387: _Param_(4) may be 0: this does not adhere to the specification for the function "VirtualProtect"
+#ifdef _DEBUG
+#include <assert.h>
+#endif
 
 class rtdhook {
 	typedef unsigned char byte_t;
@@ -24,7 +26,7 @@ private:
 public:
 	/**
 	 * @brief Конструктор
-	 * @details В конструкторе записываются необходимые данные, выделяется область для трамплина и оригинального пролога, методы заменяются позднее через метод install
+	 * @details В конструкторе записываются необходимые данные, выделяется область для трамплина и оригинального пролога, функция хукается позднее через метод install
 	 * @param hook_address Адрес функции
 	 * @param detour_function Функция, которая будет вызываться вмето оригинального
 	 * @param prologue_size Размер пролога
@@ -57,7 +59,7 @@ public:
 	}
 
 	/**
-	 * @brief Установка хука на виртуальный метод
+	 * @brief Установка хука на функцию
 	 */
 	void install()
 	{
@@ -71,13 +73,13 @@ public:
 
 		memset((void*)(mHookAddress + 5), 0x90, mHookSize - 5);
 
-		VirtualProtect((LPVOID)mHookAddress, mHookSize, old_protection, nullptr);
+		VirtualProtect((LPVOID)mHookAddress, mHookSize, old_protection, &old_protection);
 
 		setEnabled(true);
 	}
 
 	/**
-	 * @brief Снятие хука на функцию
+	 * @brief Снятие хука с функции
 	 */
 	void uninstall()
 	{
@@ -90,7 +92,7 @@ public:
 
 		memcpy((void*)mHookAddress, (void*)mOriginalPrologue, mHookSize);
 
-		VirtualProtect((LPVOID)mHookAddress, mHookSize, old_protection, nullptr);
+		VirtualProtect((LPVOID)mHookAddress, mHookSize, old_protection, &old_protection);
 
 		setEnabled(false);
 	}
@@ -98,6 +100,85 @@ public:
 	inline bool isEnabled() { return mIsEnabled; }
 	inline uintptr_t getHookAddress() { return mHookAddress; }
 	inline uintptr_t getTrampoline() { return mTrampoline; }
+};
+
+class rtdhook_call {
+	typedef unsigned char byte_t;
+private:
+	bool		mIsEnabled = false;
+
+	uintptr_t	mDetourAddress;
+	uintptr_t	mHookAddress;
+	uintptr_t	mHookedFunctionAddress;
+
+	inline void setEnabled(bool enabled) { mIsEnabled = enabled; }
+
+public:
+	/**
+	 * @brief Конструктор
+	 * @details В конструкторе записываются необходимые данные, хук происходит позже через метод install()
+	 * @param hook_address Адрес функции
+	 * @param detour_function Функция, которая будет вызываться вместо оригинального
+	 */
+	template <typename T> rtdhook_call(uintptr_t hook_address, T(*detour_function))
+	{
+#ifdef _DEBUG
+		assert(*reinterpret_cast<byte_t*>(hook_address) == 0xE8);
+#endif
+
+		mDetourAddress = reinterpret_cast<uintptr_t>(detour_function);
+		mHookAddress = hook_address;
+		mHookedFunctionAddress = *reinterpret_cast<uintptr_t*>(mHookAddress + 1);
+	}
+
+	/**
+	 * @brief Деструктор
+	 * @details В деструкторе снимается установленный хук
+	 */
+	~rtdhook_call()
+	{
+		uninstall();
+	}
+
+	/**
+	 * @brief Установка хука на вызов функции
+	 */
+	void install()
+	{
+		if (isEnabled()) return;
+
+		DWORD old_protection;
+		VirtualProtect((LPVOID)mHookAddress, 5, PAGE_EXECUTE_READWRITE, &old_protection);
+
+		*reinterpret_cast<uintptr_t*>(mHookAddress + 1) = mDetourAddress - mHookAddress - 5;
+
+		VirtualProtect((LPVOID)mHookAddress, 5, old_protection, &old_protection);
+
+		setEnabled(true);
+	}
+
+	/**
+	 * @brief Снятие хука на вызов функции
+	 */
+	void uninstall()
+	{
+		// TODO: Current realisation will break other hooks installed by this address
+
+		if (!isEnabled()) return;
+
+		DWORD old_protection;
+		VirtualProtect((LPVOID)mHookAddress, 5, PAGE_EXECUTE_READWRITE, &old_protection);
+
+		*reinterpret_cast<uintptr_t*>(mHookAddress + 1) = mHookedFunctionAddress;
+
+		VirtualProtect((LPVOID)mHookAddress, 5, old_protection, &old_protection);
+
+		setEnabled(false);
+	}
+
+	inline bool isEnabled() { return mIsEnabled; }
+	inline uintptr_t getHookAddress() { return mHookAddress; }
+	inline uintptr_t getHookedFunctionAddress() { return mHookedFunctionAddress + mHookAddress + 5; }
 };
 
 class rtdhook_vmt {
@@ -117,7 +198,7 @@ private:
 		uintptr_t* vmt = *reinterpret_cast<uintptr_t**>(mVmtAddress);
 		VirtualProtect(vmt + method_id, 4, PAGE_EXECUTE_READWRITE, &old_protection);
 		*reinterpret_cast<uintptr_t*>(vmt + method_id) = detour_function;
-		VirtualProtect(vmt + method_id, 4, old_protection, nullptr);
+		VirtualProtect(vmt + method_id, 4, old_protection, &old_protection);
 	}
 public:
 	/**
@@ -207,5 +288,3 @@ public:
 		return *reinterpret_cast<uintptr_t*>(vmt + method_id);
 	}
 };
-
-#pragma warning(default : 6387)

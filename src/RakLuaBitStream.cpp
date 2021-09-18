@@ -145,7 +145,7 @@ float RakLuaBitStream::readFloat()
 
 std::string RakLuaBitStream::readString(int32_t len)
 {
-	std::string ret(len, 0);
+	std::string ret(len, '\0');
 	bs->Read(ret.data(), len);
 	return ret;
 }
@@ -250,19 +250,21 @@ bool RakLuaBitStream::emulIncomingPacket(uint8_t packetId)
 	Packet* send_packet = reinterpret_cast<Packet*(*)(int)>(sampGetAllocPacketPtr())(send_bs.GetNumberOfBytesUsed());
 	memcpy(send_packet->data, send_bs.GetData(), send_packet->length);
 
-	// RakPeer::AddPacketToProducer
-	char* packets = static_cast<char*>(gRakPeer) + 0xdb6;
-	auto write_lock = reinterpret_cast<Packet**(__thiscall*)(void*)>(sampGetWriteLockPtr());
-	auto write_unlock = reinterpret_cast<void(__thiscall*)(void*)>(sampGetWriteUnlockPtr());
+	{
+		// RakPeer::AddPacketToProducer
+		char* packets = static_cast<char*>(gRakPeer) + 0xdb6;
+		auto write_lock = reinterpret_cast<Packet**(__thiscall*)(void*)>(sampGetWriteLockPtr());
+		auto write_unlock = reinterpret_cast<void(__thiscall*)(void*)>(sampGetWriteUnlockPtr());
 
-	*write_lock(packets) = send_packet;
-	write_unlock(packets);
-	// RakPeer::AddPacketToProducer
+		*write_lock(packets) = send_packet;
+		write_unlock(packets);
+		// RakPeer::AddPacketToProducer
+	}
 
 	return true;
 }
 
-#define RAKCLIENT_INTF *reinterpret_cast<uintptr_t*>(sampGetRakClientInterface())
+#define RAKCLIENT_INTF reinterpret_cast<uintptr_t>(gRakPeer) + 0xDDE
 
 bool RakLuaBitStream::sendRPC(int rpcId)
 {

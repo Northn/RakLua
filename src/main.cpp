@@ -102,7 +102,7 @@ void initBitStream(sol::state_view& lua)
 
 #undef INIT_METHOD
 
-#define INIT_FUNCTION(name) lua.set_function(#name, name)
+#define INIT_FUNCTION(name) lua.set_function(#name, &name)
 
 void defineGlobals(sol::this_state ts)
 {
@@ -226,12 +226,15 @@ RakLua::eInitState getState(sol::this_state ts)
 
 sol::table open(sol::this_state ts)
 {
-	gRakLua.initialize();
-
 	sol::state_view lua(ts);
 
+	if (gRakLua.getState() == RakLua::eInitState::NOT_INITIALIZED && *reinterpret_cast<uintptr_t*>(0xC8D4C0) == 9)
+		lua["print"]("[RakLua] ERROR! Your game is already started.\n\tThis is inacceptible and RakLua can't work properly as long as RakPeer is already initialized.\n\tPlease, restart your game. RakLua must start together with game and SAMP.");
+	else
+		gRakLua.initialize();
+
 	sol::table module = lua.create_table();
-	module["VERSION"] = 2.01;
+	module["VERSION"] = 2.1;
 	module.set_function("getState", &getState);
 
 	module.set_function("registerHandler", &registerHandler);
