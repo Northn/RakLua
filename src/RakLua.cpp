@@ -22,7 +22,8 @@ RakLua::eInitState RakLua::initialize()
 
 	mState = eInitState::INITIALIZING;
 
-	mRakClientIntfConstructor = new rtdhook(sampGetRakClientIntfConstructorPtr(), &hookRakClientIntfConstructor, 7);
+	mRakClientIntfConstructor = new kthook::kthook_simple<uintptr_t(*)()>(sampGetRakClientIntfConstructorPtr());
+	mRakClientIntfConstructor->set_cb(hookRakClientIntfConstructor);
 	mRakClientIntfConstructor->install();
 
 returnState:
@@ -229,9 +230,9 @@ bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int len
 		(gRakLua.getRpcHook()->getTrampoline())(ptr, bs.GetData(), bs.GetNumberOfBytesUsed(), playerId);
 }
 
-uintptr_t hookRakClientIntfConstructor()
+uintptr_t hookRakClientIntfConstructor(const kthook::kthook_simple<uintptr_t(*)()> &hook)
 {
-	uintptr_t rakClientInterface = reinterpret_cast<uintptr_t(*)()>(gRakLua.getIntfConstructorHook()->getTrampoline())();
+	uintptr_t rakClientInterface = gRakLua.getIntfConstructorHook()->call_trampoline();
 	if (rakClientInterface)
 	{
 		gRakPeer = reinterpret_cast<void*>(rakClientInterface - 0xDDE);

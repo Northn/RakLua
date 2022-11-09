@@ -11,7 +11,7 @@ local events = {
 
 local addEventHandler_orig = addEventHandler
 
-function hookAddEventHandler(event, func)
+local function hookAddEventHandler(event, func)
     if events[event] then
         RakLuaDll.registerHandler(events[event], func)
     else
@@ -19,7 +19,7 @@ function hookAddEventHandler(event, func)
     end
 end
 
-function defineSampLuaCompatibility()
+local function defineSampLuaCompatibility()
     RakLuaDll.defineGlobals()
     
     addEventHandler = hookAddEventHandler

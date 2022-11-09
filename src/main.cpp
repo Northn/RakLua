@@ -234,7 +234,7 @@ sol::table open(sol::this_state ts)
 		gRakLua.initialize();
 
 	sol::table module = lua.create_table();
-	module["VERSION"] = 2.1;
+	module["VERSION"] = 2.11;
 	module.set_function("getState", &getState);
 
 	module.set_function("registerHandler", &registerHandler);
@@ -261,3 +261,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 	}
 	return TRUE;
 }
+
+// the dumbest linker error hack
+#include "hde/hde32.h"
+#include "hde/hde32.c"

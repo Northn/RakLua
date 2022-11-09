@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RakLuaBitStream.h"
+#include "kthook/kthook.hpp"
 #include "samp.hpp"
 
 class RakLua
@@ -12,9 +13,9 @@ public:
 private:
 	eInitState		mState = eInitState::NOT_INITIALIZED;
 
-	rtdhook_vmt*	mVmtHook = nullptr;
-	rtdhook*		mIncomingRpcHandlerHook = nullptr;
-	rtdhook*		mRakClientIntfConstructor = nullptr;
+	rtdhook_vmt*								mVmtHook = nullptr;
+	rtdhook*									mIncomingRpcHandlerHook = nullptr;
+	kthook::kthook_simple<uintptr_t(*)()>*		mRakClientIntfConstructor = nullptr;
 
 	struct handlers {
 		std::vector<event_handler_t> incomingRpc;
@@ -37,7 +38,7 @@ public:
 	inline rtdhook_vmt* getVmtHook()	{ return mVmtHook; };
 	inline handlers&	getHandlers()	{ return mHandlers; };
 	inline rtdhook*		getRpcHook()	{ return mIncomingRpcHandlerHook; };
-	inline rtdhook*		getIntfConstructorHook() { return mRakClientIntfConstructor; }
+	inline auto			getIntfConstructorHook() { return mRakClientIntfConstructor; }
 
 	template <typename... Args>
 	static bool safeCall(sol::function handler, Args&&... args);
@@ -66,4 +67,4 @@ bool __fastcall handleOutgoingPacket(void* ptr, void*, BitStream* bitStream, Pac
 Packet* __fastcall handleIncomingPacket(void* ptr, void*);
 bool __fastcall handleOutgoingRpc(void* ptr, void*, int* id, BitStream* bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, bool shiftTimestamp);
 bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int length, PlayerID playerId);
-uintptr_t hookRakClientIntfConstructor();
+uintptr_t hookRakClientIntfConstructor(const kthook::kthook_simple<uintptr_t(*)()>& hook);
