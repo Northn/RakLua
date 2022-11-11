@@ -43,10 +43,12 @@ void RakLua::postRakClientInitialization(uintptr_t rakClientIntf)
 	mState = eInitState::OK;
 }
 
-bool RakLua::addEventHandler(sol::this_state& ts, eEventType type, sol::function detour)
+bool RakLua::addEventHandler(sol::this_state& ts, eEventType type, sol::function &detour_f)
 {
 	sol::state_view lua{ ts };
 	int id = lua["script"]["this"]["id"];
+	auto main_thread = sol::main_thread(ts);
+	sol::protected_function detour(main_thread, detour_f);
 
 	switch (type)
 	{

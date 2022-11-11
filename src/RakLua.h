@@ -30,7 +30,7 @@ public:
 	
 	void		postRakClientInitialization(uintptr_t rakClientIntf);
 
-	bool		addEventHandler(sol::this_state& ts, eEventType type, sol::function detour);
+	bool		addEventHandler(sol::this_state& ts, eEventType type, sol::function &detour_f);
 	void		destroyHandlers(sol::this_state& ts);
 
 	inline bool			isInitialized() { return mState == eInitState::OK; }
