@@ -20,7 +20,11 @@ void initEnums(sol::state_view& lua)
 			{ "SAMP_NOT_LOADED", SAMPVER::SAMP_NOT_LOADED },
 			{ "SAMP_UNKNOWN", SAMPVER::SAMP_UNKNOWN },
 			{ "SAMP_037_R1", SAMPVER::SAMP_037_R1 },
+			{ "SAMP_037_R2", SAMPVER::SAMP_037_R2 },
 			{ "SAMP_037_R3_1", SAMPVER::SAMP_037_R3_1 },
+			{ "SAMP_037_R4_2", SAMPVER::SAMP_037_R4_2 },
+			{ "SAMP_037_R5_1", SAMPVER::SAMP_037_R5_1 },
+			{ "SAMP_037_DL", SAMPVER::SAMP_037_DL },
 		}
 	);
 
@@ -234,7 +238,7 @@ sol::table open(sol::this_state ts)
 		gRakLua.initialize();
 
 	sol::table module = lua.create_table();
-	module["VERSION"] = 2.12;
+	module["VERSION"] = 2.13;
 	module.set_function("getState", &getState);
 
 	module.set_function("registerHandler", &registerHandler);
