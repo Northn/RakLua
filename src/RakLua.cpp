@@ -22,9 +22,9 @@ RakLua::eInitState RakLua::initialize()
 
 	mState = eInitState::INITIALIZING;
 
-	mRakClientIntfConstructor = new kthook::kthook_simple<uintptr_t(*)()>(sampGetRakClientIntfConstructorPtr());
-	mRakClientIntfConstructor->set_cb(hookRakClientIntfConstructor);
-	mRakClientIntfConstructor->install();
+	mRakClientIntfConstructor.set_dest(sampGetRakClientIntfConstructorPtr());
+	mRakClientIntfConstructor.set_cb(hookRakClientIntfConstructor);
+	mRakClientIntfConstructor.install();
 
 returnState:
 	return mState;
@@ -32,8 +32,9 @@ returnState:
 
 void RakLua::postRakClientInitialization(uintptr_t rakClientIntf)
 {
-	mIncomingRpcHandlerHook = new rtdhook(sampGetIncomingRpcHandlerPtr(), &handleIncomingRpc);
-	mIncomingRpcHandlerHook->install();
+	mIncomingRpcHandlerHook.set_dest(sampGetIncomingRpcHandlerPtr());
+	mIncomingRpcHandlerHook.set_cb(handleIncomingRpc);
+	mIncomingRpcHandlerHook.install();
 
 	mVmtHook = new rtdhook_vmt(rakClientIntf);
 	mVmtHook->install(6, &handleOutgoingPacket);
@@ -166,7 +167,7 @@ bool __fastcall handleOutgoingRpc(void* ptr, void*, int* id, BitStream* bitStrea
 		(gRakLua.getVmtHook()->getOriginalMethod(25))(ptr, id, bitStream, priority, reliability, orderingChannel, shiftTimestamp);
 }
 
-bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int length, PlayerID playerId)
+bool handleIncomingRpc(const kthook::kthook_simple<bool(__thiscall*)(void*, unsigned char*, int, PlayerID)>& hook, void* ptr, unsigned char* data, int length, PlayerID playerId)
 {
 	//gRakPeer = ptr;
 	gPlayerId = playerId;
@@ -228,13 +229,12 @@ bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int len
 	if (bits_data)
 		bs.WriteBits(callback_bs->GetData(), bits_data, false);
 
-	return reinterpret_cast<bool(__thiscall*)(void*, unsigned char*, int, PlayerID)>
-		(gRakLua.getRpcHook()->getTrampoline())(ptr, bs.GetData(), bs.GetNumberOfBytesUsed(), playerId);
+	return hook.call_trampoline(ptr, bs.GetData(), bs.GetNumberOfBytesUsed(), playerId);
 }
 
 uintptr_t hookRakClientIntfConstructor(const kthook::kthook_simple<uintptr_t(*)()> &hook)
 {
-	uintptr_t rakClientInterface = gRakLua.getIntfConstructorHook()->call_trampoline();
+	uintptr_t rakClientInterface = hook.call_trampoline();
 	if (rakClientInterface)
 	{
 		gRakPeer = reinterpret_cast<void*>(rakClientInterface - 0xDDE);

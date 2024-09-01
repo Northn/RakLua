@@ -14,8 +14,8 @@ private:
 	eInitState		mState = eInitState::NOT_INITIALIZED;
 
 	rtdhook_vmt*								mVmtHook = nullptr;
-	rtdhook*									mIncomingRpcHandlerHook = nullptr;
-	kthook::kthook_simple<uintptr_t(*)()>*		mRakClientIntfConstructor = nullptr;
+	kthook::kthook_simple<bool(__thiscall*)(void*, unsigned char*, int, PlayerID)>       mIncomingRpcHandlerHook;
+	kthook::kthook_simple<uintptr_t(*)()>		mRakClientIntfConstructor;
 
 	struct handlers {
 		std::vector<event_handler_t> incomingRpc;
@@ -37,8 +37,8 @@ public:
 	inline eInitState	getState()		{ return mState; }
 	inline rtdhook_vmt* getVmtHook()	{ return mVmtHook; };
 	inline handlers&	getHandlers()	{ return mHandlers; };
-	inline rtdhook*		getRpcHook()	{ return mIncomingRpcHandlerHook; };
-	inline auto			getIntfConstructorHook() { return mRakClientIntfConstructor; }
+	inline auto&        getRpcHook()	{ return mIncomingRpcHandlerHook; };
+	inline auto&		getIntfConstructorHook() { return mRakClientIntfConstructor; }
 
 	template <typename... Args>
 	static bool safeCall(sol::function handler, Args&&... args);
@@ -66,5 +66,5 @@ inline PlayerID gPlayerId;
 bool __fastcall handleOutgoingPacket(void* ptr, void*, BitStream* bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel);
 Packet* __fastcall handleIncomingPacket(void* ptr, void*);
 bool __fastcall handleOutgoingRpc(void* ptr, void*, int* id, BitStream* bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, bool shiftTimestamp);
-bool __fastcall handleIncomingRpc(void* ptr, void*, unsigned char* data, int length, PlayerID playerId);
+bool handleIncomingRpc(const kthook::kthook_simple<bool(__thiscall*)(void*, unsigned char*, int, PlayerID)>& hook, void* ptr, unsigned char* data, int length, PlayerID playerId);
 uintptr_t hookRakClientIntfConstructor(const kthook::kthook_simple<uintptr_t(*)()>& hook);
