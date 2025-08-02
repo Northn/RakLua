@@ -253,7 +253,7 @@ sol::table open(sol::this_state ts)
 		gRakLua.initialize();
 
 	sol::table module = lua.create_table();
-	module["VERSION"] = 2.14;
+	module["VERSION"] = 2.15;
 	module.set_function("getState", &getState);
 
 	module.set_function("registerHandler", &registerHandler);
