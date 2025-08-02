@@ -144,9 +144,24 @@ void defineGlobals(sol::this_state ts)
 	INIT_FUNCTION(raknetBitStreamReadBuffer);
 
 	INIT_FUNCTION(raknetBitStreamWriteBool);
-	INIT_FUNCTION(raknetBitStreamWriteInt8);
-	INIT_FUNCTION(raknetBitStreamWriteInt16);
-	INIT_FUNCTION(raknetBitStreamWriteInt32);
+	lua.set_function("raknetBitStreamWriteInt8",
+		sol::overload(
+			[](RakLuaBitStream* bs, uint8_t v) { raknetBitStreamWriteInt8(bs, v); },
+			[](RakLuaBitStream* bs, float v) { raknetBitStreamWriteInt8(bs, static_cast<uint8_t>(v)); }
+		)
+	);
+	lua.set_function("raknetBitStreamWriteInt16",
+		sol::overload(
+			[](RakLuaBitStream* bs, uint16_t v) { raknetBitStreamWriteInt16(bs, v); },
+			[](RakLuaBitStream* bs, float v) { raknetBitStreamWriteInt16(bs, static_cast<uint16_t>(v)); }
+		)
+	);
+	lua.set_function("raknetBitStreamWriteInt32",
+		sol::overload(
+			[](RakLuaBitStream* bs, int32_t v) { raknetBitStreamWriteInt32(bs, v); },
+			[](RakLuaBitStream* bs, float v) { raknetBitStreamWriteInt32(bs, static_cast<int32_t>(v)); }
+		)
+	);
 	INIT_FUNCTION(raknetBitStreamWriteFloat);
 	INIT_FUNCTION(raknetBitStreamWriteString);
 	INIT_FUNCTION(raknetBitStreamEncodeString);
