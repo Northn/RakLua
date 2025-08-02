@@ -56,7 +56,7 @@ struct PlayerID
 
 struct NetworkID
 {
-	bool peerToPeer;
+	static bool peerToPeer;
 	PlayerID playerId;
 	unsigned short localSystemId;
 };
@@ -259,21 +259,4 @@ public:
 	virtual void ApplyNetworkSimulator(double maxSendBPS, unsigned short minExtraPing, unsigned short extraPingVariance);
 	virtual bool IsNetworkSimulatorActive(void);
 	virtual PlayerIndex GetPlayerIndex(void);
-};
-
-enum NetPatchType
-{
-	INCOMING_RPC,
-	OUTGOING_RPC,
-	INCOMING_PACKET,
-	OUTGOING_PACKET,
-};
-
-struct stNetPatch
-{
-	const char *name;
-	int hotkey;
-	bool enabled;
-	byte id;
-	NetPatchType type;
 };
